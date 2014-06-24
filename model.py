@@ -15,6 +15,9 @@ class Melon(object):
     def price_str(self):
         return "$%.2f"%self.price
 
+    def total_str(self):
+        return "$%.2f"%(float(self.price) * int(self.qty))    
+
     def __repr__(self):
         return "<Melon: %s, %s, %s>"%(self.id, self.common_name, self.price_str())
 
