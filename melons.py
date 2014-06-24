@@ -29,9 +29,6 @@ def show_melon(id):
 
 @app.route("/cart")
 def shopping_cart():
-    # """TODO: Display the contents of the shopping cart. The shopping cart is a
-    # list held in the session that contains all the melons to be added. Check
-    # accompanying screenshots for details."""
     
 
     if "cart" not in session:
@@ -40,34 +37,30 @@ def shopping_cart():
 
     full_cart = {}
     cart_total = 0
-    for item in session['cart']:
+    """ take melon_id and qty from session and build line to send to table in list melons"""
+    for item in session["cart"]:
         melon_id = item[0]
         melon = model.get_melon_by_id(melon_id)
         melon.qty = item[1]
         full_cart[melon_id] = melon
         cart_total += melon.price * melon.qty
 
-
-
     return render_template("cart.html", full_cart = full_cart, total="$%.2f"%cart_total)
     
 @app.route("/add_to_cart/<int:id>")
 def add_to_cart(id):
-    # """TODO: Finish shopping cart functionality using session variables to hold
-    # cart list.
-    
-    # Intended behavior: when a melon is added to a cart, redirect them to the
-    # shopping cart page, while displaying the message
-    # "Successfully added to cart" """
+    """cart is the melon id and qty""" 
 
     if "cart" not in session:
         session["cart"] = []
     melon_id = id    
     found = False
+    """ if the melon is in the cart or clicked on more than once, increment qty"""
     for melon in session["cart"]:
         if melon[0] == id:
             melon[1] += 1
             found = True
+     """ if they haven't added anything to the cart, set up a blank cart. """
     if not found:
         session["cart"].append([melon_id, 1])
     flash("Successfully added to cart")
@@ -81,10 +74,18 @@ def show_login():
 
 @app.route("/login", methods=["POST"])
 def process_login():
-    """TODO: Receive the user's login credentials located in the 'request.form'
-    dictionary, look up the user, and store them in the session."""
-    return "Oops! This needs to be implemented"
-
+    """user enters email ,used to look up customer in DB."""
+    form_email = request.form['email']
+    """setting variable customer object to result of calling get_customer_by_email method from model"""
+    customer = model.get_customer_by_email(form_email)
+    if customer:
+        """setting session to customer givenname to be used on base.html"""
+        session["cust"] = customer.givenname
+        flash("Login successful.  Welcome back!")
+        return redirect("/melons")
+    else:
+        flash("No such email in our customer database. Please re-enter.")
+        return redirect("/login")
 
 @app.route("/checkout")
 def checkout():

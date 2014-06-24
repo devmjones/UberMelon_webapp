@@ -16,13 +16,18 @@ class Melon(object):
         return "$%.2f"%self.price
 
     def total_str(self):
+        """melon price * melon quantity in $ string format"""
         return "$%.2f"%(float(self.price) * int(self.qty))    
 
     def __repr__(self):
         return "<Melon: %s, %s, %s>"%(self.id, self.common_name, self.price_str())
 
 class Customer(object):
-    pass
+    def __init__(self, id, email, givenname, surname):
+        self.id = id
+        self.email = email
+        self.givenname = givenname
+        self.surname = surname
 
 def connect():
     conn = sqlite3.connect("melons.db")
@@ -76,4 +81,16 @@ def get_melon_by_id(id):
     return melon
 
 def get_customer_by_email(email):
-    pass
+    """ Take email address and use to look up customer in database"""
+    cursor = connect()
+    query = """SELECT id, email, givenname, surname 
+               FROM customers
+               WHERE email = ?;"""
+    cursor.execute(query, (email, ))
+    row = cursor.fetchone()
+    """row was returned as list of variables identified in query statement"""
+    if not row:
+        return None
+    """set cust object to cust id, cust email, cust first name, cust last name"""
+    customer = Customer(row[0], row[1], row[2], row[3])
+    return customer
