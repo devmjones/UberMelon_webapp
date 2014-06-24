@@ -29,25 +29,36 @@ def show_melon(id):
 
 @app.route("/cart")
 def shopping_cart():
-    """TODO: Display the contents of the shopping cart. The shopping cart is a
-    list held in the session that contains all the melons to be added. Check
-    accompanying screenshots for details."""
+    # """TODO: Display the contents of the shopping cart. The shopping cart is a
+    # list held in the session that contains all the melons to be added. Check
+    # accompanying screenshots for details."""
+    
+
+    if "cart" not in session:
+        flash("Your cart is empty.")
+        return redirect(url_for("list_melons"))
+
     full_cart = {}
+    cart_total = 0
     for item in session['cart']:
         melon_id = item[0]
         melon = model.get_melon_by_id(melon_id)
         melon.qty = item[1]
         full_cart[melon_id] = melon
-    return render_template("cart.html", full_cart = full_cart)
+        cart_total += melon.price * melon.qty
+
+
+
+    return render_template("cart.html", full_cart = full_cart, total="$%.2f"%cart_total)
     
 @app.route("/add_to_cart/<int:id>")
 def add_to_cart(id):
-    """TODO: Finish shopping cart functionality using session variables to hold
-    cart list.
+    # """TODO: Finish shopping cart functionality using session variables to hold
+    # cart list.
     
-    Intended behavior: when a melon is added to a cart, redirect them to the
-    shopping cart page, while displaying the message
-    "Successfully added to cart" """
+    # Intended behavior: when a melon is added to a cart, redirect them to the
+    # shopping cart page, while displaying the message
+    # "Successfully added to cart" """
 
     if "cart" not in session:
         session["cart"] = []
